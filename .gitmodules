@@ -1,0 +1,3 @@
+[submodule "SurveyChain/lib/forge-std"]
+	path = SurveyChain/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
