@@ -10,4 +10,6 @@ contract SurveySystemTest is Test {
     function setUp() public {}
 
     function testSurveyCreation() public {}
+
+    function testSurveyVoting() public {}
 }

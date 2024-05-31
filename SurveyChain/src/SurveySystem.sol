@@ -22,5 +22,19 @@ contract SurveySystem {
         bool isClosed;
     }
 
-    
+    function createSurvey(string memory _description, uint256[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) public {
+        
+    }
+
+    function vote(uint256 _surveyId, uint256 _choice) public {
+        
+    }
+
+    function closeSurvey(uint256 _surveyId) public {
+        
+    }
+
+    function getSurvey(uint256 _surveyId) public view returns (Survey memory) {
+        
+    }
 }
