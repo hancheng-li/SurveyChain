@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: surveysh
 pragma solidity ^0.8.13;
 
 contract SurveySystem {
