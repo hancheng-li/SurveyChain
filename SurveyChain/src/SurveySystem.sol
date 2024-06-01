@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 
 contract SurveySystem {
     
-    // mapping (address => string) public usernames;
     mapping (address => uint256) public roles; // 0: Registered User, 1: Unregistered User
     mapping (address => string) public usernames;
 
@@ -12,7 +11,7 @@ contract SurveySystem {
     struct Survey {
         string description;
         uint256 id;
-        string[] choices; // Descriptions of the choices (changed to string[])
+        string[] choices;
         uint256 startTime;
         uint256 endTime;
         uint256 maxVotes;
@@ -20,20 +19,19 @@ contract SurveySystem {
         uint256 reward;
         address[] voters;
         bool isClosed;
-        // Added in line below, Address of the survey creator
         address owner;
     }
     
     mapping(uint256 => mapping(address => bool)) public hasVoted;
 
-    // Function to create a new survey
-    function createSurvey(string memory _description, string[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) public {
+    function createSurvey(string memory _description, string[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) public payable {
         require(_choices.length > 0, "Survey must have at least one choice");
         require(duration > 0, "Survey duration must be greater than zero");
         require(_maxVotes > 0, "Max votes must be greater than zero");
         require(_reward > 0, "Reward must be greater than zero");
+        require(msg.value >= _reward, "Insufficient Ether sent for reward");
 
-        uint256 surveyId = surveys.length;  // Use the length of the surveys array as the new survey ID
+        uint256 surveyId = surveys.length;
         surveys.push();
 
         Survey storage newSurvey = surveys[surveyId];
@@ -43,13 +41,12 @@ contract SurveySystem {
         newSurvey.startTime = block.timestamp;
         newSurvey.endTime = block.timestamp + duration;
         newSurvey.maxVotes = _maxVotes;
-        newSurvey.votes = new uint256[](_choices.length);  // Initialize the votes array
+        newSurvey.votes = new uint256[](_choices.length);
         newSurvey.reward = _reward;
         newSurvey.isClosed = false;
         newSurvey.owner = msg.sender;
     }
 
-    // Getter functions to retrieve survey details in parts
     function getSurveyDescription(uint256 _surveyId) public view returns (string memory) {
         return surveys[_surveyId].description;
     }
@@ -90,7 +87,6 @@ contract SurveySystem {
         return surveys[_surveyId].voters;
     }
 
-    // Function to vote in a survey
     function vote(uint256 _surveyId, uint256 _choice) public {
         require(_surveyId < surveys.length, "Survey does not exist");
         Survey storage survey = surveys[_surveyId];
@@ -106,7 +102,21 @@ contract SurveySystem {
     }
 
     function closeSurvey(uint256 _surveyId) public {
-        
+        require(_surveyId < surveys.length, "Survey does not exist");
+        Survey storage survey = surveys[_surveyId];
+        require(msg.sender == survey.owner, "Only the owner can close the survey");
+        require(!survey.isClosed, "Survey is already closed");
+
+        survey.isClosed = true;
+
+        if (survey.voters.length > 0) {
+            uint256 rewardPerVoter = survey.reward / survey.voters.length;
+            for (uint256 i = 0; i < survey.voters.length; i++) {
+                address voter = survey.voters[i];
+                payable(voter).transfer(rewardPerVoter);
+            }
+        }
     }
 
+    receive() external payable {}
 }
