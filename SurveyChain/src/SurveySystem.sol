@@ -48,32 +48,6 @@ contract SurveySystem {
     }
 
     // Getter functions to retrieve survey details in parts
-    function getSurveyBasicDetails(uint256 _surveyId) public view returns (
-        string memory description,
-        uint256 id,
-        string[] memory choices,
-        uint256 startTime,
-        uint256 endTime,
-        uint256 maxVotes,
-        uint256 reward,
-        bool isClosed,
-        address owner
-    ) {
-        Survey storage survey = surveys[_surveyId];
-        return (
-            survey.description,
-            survey.id,
-            survey.choices,
-            survey.startTime,
-            survey.endTime,
-            survey.maxVotes,
-            survey.reward,
-            survey.isClosed,
-            survey.owner
-        );
-    }
-
-    // Getter functions to retrieve survey details in parts
     function getSurveyDescription(uint256 _surveyId) public view returns (string memory) {
         return surveys[_surveyId].description;
     }
