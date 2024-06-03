@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 contract SurveySystem {
-    
+
     mapping (address => uint256) public roles; // 0: Registered User, 1: Unregistered User
     mapping (address => string) public usernames;
 
@@ -21,15 +21,23 @@ contract SurveySystem {
         bool isClosed;
         address owner;
     }
-    
+
     mapping(uint256 => mapping(address => bool)) public hasVoted;
 
+    // Function to register a user
+    function registerUser(string memory username) public {
+        require(bytes(username).length > 0, "Username cannot be empty");
+        usernames[msg.sender] = username;
+        roles[msg.sender] = 0; // Registered User
+    }
+
+    // Function to create a new survey
     function createSurvey(string memory _description, string[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) public payable {
         require(_choices.length > 0, "Survey must have at least one choice");
         require(duration > 0, "Survey duration must be greater than zero");
         require(_maxVotes > 0, "Max votes must be greater than zero");
         require(_reward > 0, "Reward must be greater than zero");
-        require(msg.value >= _reward, "Insufficient Ether sent for reward");
+        require(msg.value == _reward, "Reward value must be sent");
 
         uint256 surveyId = surveys.length;
         surveys.push();
@@ -47,46 +55,12 @@ contract SurveySystem {
         newSurvey.owner = msg.sender;
     }
 
-    function getSurveyDescription(uint256 _surveyId) public view returns (string memory) {
-        return surveys[_surveyId].description;
+    function getSurvey(uint256 _surveyId) public view returns (Survey memory) {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        return surveys[_surveyId];
     }
 
-    function getSurveyChoices(uint256 _surveyId) public view returns (string[] memory) {
-        return surveys[_surveyId].choices;
-    }
-
-    function getSurveyStartTime(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].startTime;
-    }
-
-    function getSurveyEndTime(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].endTime;
-    }
-
-    function getSurveyMaxVotes(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].maxVotes;
-    }
-
-    function getSurveyReward(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].reward;
-    }
-
-    function getSurveyIsClosed(uint256 _surveyId) public view returns (bool) {
-        return surveys[_surveyId].isClosed;
-    }
-
-    function getSurveyOwner(uint256 _surveyId) public view returns (address) {
-        return surveys[_surveyId].owner;
-    }
-
-    function getSurveyVotes(uint256 _surveyId) public view returns (uint256[] memory) {
-        return surveys[_surveyId].votes;
-    }
-
-    function getSurveyVoters(uint256 _surveyId) public view returns (address[] memory) {
-        return surveys[_surveyId].voters;
-    }
-
+    // Function to vote in a survey
     function vote(uint256 _surveyId, uint256 _choice) public {
         require(_surveyId < surveys.length, "Survey does not exist");
         Survey storage survey = surveys[_surveyId];
@@ -101,6 +75,38 @@ contract SurveySystem {
         hasVoted[_surveyId][msg.sender] = true;
     }
 
+    // Function to withdraw reward
+    function withdrawReward(uint256 _surveyId) public {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        Survey storage survey = surveys[_surveyId];
+        require(survey.isClosed, "Survey is not closed yet");
+        require(survey.reward > 0, "No rewards available");
+
+        uint256 rewardPerVoter = survey.reward / survey.voters.length;
+        for (uint256 i = 0; i < survey.voters.length; i++) {
+            address voter = survey.voters[i];
+            payable(voter).transfer(rewardPerVoter);
+        }
+    }
+
+    // Function to check if a user has participated in a survey
+    function hasUserParticipated(uint256 _surveyId, address user) public view returns (bool) {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        return hasVoted[_surveyId][user];
+    }
+
+    // Function to get survey participants
+    function getSurveyParticipants(uint256 _surveyId) public view returns (address[] memory) {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        return surveys[_surveyId].voters;
+    }
+
+    // Function to get total number of surveys
+    function getTotalSurveys() public view returns (uint256) {
+        return surveys.length;
+    }
+
+    // Function to close a survey
     function closeSurvey(uint256 _surveyId) public {
         require(_surveyId < surveys.length, "Survey does not exist");
         Survey storage survey = surveys[_surveyId];
