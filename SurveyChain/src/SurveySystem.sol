@@ -23,9 +23,13 @@ contract SurveySystem {
         // Added in line below, Address of the survey creator
         address owner;
     }
-    
+
     mapping(uint256 => mapping(address => bool)) public hasVoted;
 
+    // Function to register a user
+    function registerUser(string memory username) public {
+        // Implementation goes here
+    }
     // Function to create a new survey
     function createSurvey(string memory _description, string[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) public {
         require(_choices.length > 0, "Survey must have at least one choice");
@@ -105,8 +109,36 @@ contract SurveySystem {
         hasVoted[_surveyId][msg.sender] = true;
     }
 
+    // Function to close a survey
     function closeSurvey(uint256 _surveyId) public {
-        
+        // Implementation goes here
+    }
+
+    // Function to withdraw reward
+    function withdrawReward(uint256 _surveyId) public {
+        // Implementation goes here
+    }
+
+    // Function to check if a user has participated in a survey
+    function hasUserParticipated(uint256 _surveyId, address user) public view returns (bool) {
+        // Implementation goes here
+    }
+
+    // Function to get survey participants
+    function getSurveyParticipants(uint256 _surveyId) public view returns (address[] memory) {
+        // Implementation goes here
+    }
+
+    // Function to get total number of surveys
+    function getTotalSurveys() public view returns (uint256) {
+        // Implementation goes here
+    }
+
+
+    // Similar to above split up gets
+    // Function to get survey details
+    function getSurvey(uint256 _surveyId) public view returns (Survey memory) {
+        // Implementation goes here
     }
 
 }
