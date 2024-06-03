@@ -53,45 +53,9 @@ contract SurveySystem {
         newSurvey.owner = msg.sender;
     }
 
-    // Getter functions to retrieve survey details in parts
-    function getSurveyDescription(uint256 _surveyId) public view returns (string memory) {
-        return surveys[_surveyId].description;
-    }
-
-    function getSurveyChoices(uint256 _surveyId) public view returns (string[] memory) {
-        return surveys[_surveyId].choices;
-    }
-
-    function getSurveyStartTime(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].startTime;
-    }
-
-    function getSurveyEndTime(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].endTime;
-    }
-
-    function getSurveyMaxVotes(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].maxVotes;
-    }
-
-    function getSurveyReward(uint256 _surveyId) public view returns (uint256) {
-        return surveys[_surveyId].reward;
-    }
-
-    function getSurveyIsClosed(uint256 _surveyId) public view returns (bool) {
-        return surveys[_surveyId].isClosed;
-    }
-
-    function getSurveyOwner(uint256 _surveyId) public view returns (address) {
-        return surveys[_surveyId].owner;
-    }
-
-    function getSurveyVotes(uint256 _surveyId) public view returns (uint256[] memory) {
-        return surveys[_surveyId].votes;
-    }
-
-    function getSurveyVoters(uint256 _surveyId) public view returns (address[] memory) {
-        return surveys[_surveyId].voters;
+    function getSurvey(uint256 _surveyId) public view returns (Survey memory) {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        return surveys[_surveyId];
     }
 
     // Function to vote in a survey
@@ -134,11 +98,7 @@ contract SurveySystem {
         // Implementation goes here
     }
 
-
     // Similar to above split up gets
     // Function to get survey details
-    function getSurvey(uint256 _surveyId) public view returns (Survey memory) {
-        // Implementation goes here
-    }
 
 }
