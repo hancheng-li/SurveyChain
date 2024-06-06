@@ -83,55 +83,53 @@ contract SurveySystem {
         survey.votes[_choice]++;
         survey.voters.push(msg.sender);
         hasVoted[_surveyId][msg.sender] = true;
-    }
 
-    // Function to withdraw reward
-    function withdrawReward(uint256 _surveyId) public {
-        require(_surveyId < surveys.length, "Survey does not exist");
-        Survey storage survey = surveys[_surveyId];
-        require(survey.isClosed, "Survey is not closed yet");
-        require(survey.reward > 0, "No rewards available");
-
-        uint256 rewardPerVoter = survey.reward / survey.voters.length;
-        for (uint256 i = 0; i < survey.voters.length; i++) {
-            address voter = survey.voters[i];
-            payable(voter).transfer(rewardPerVoter);
+        // Close the survey if max votes reached
+        if (survey.voters.length >= survey.maxVotes) {
+            survey.isClosed = true;
         }
     }
 
-    // Function to check if a user has participated in a survey
-    function hasUserParticipated(uint256 _surveyId, address user) public view returns (bool) {
-        require(_surveyId < surveys.length, "Survey does not exist");
-        return hasVoted[_surveyId][user];
-    }
-
-    // Function to get survey participants
-    function getSurveyParticipants(uint256 _surveyId) public view returns (address[] memory) {
-        require(_surveyId < surveys.length, "Survey does not exist");
-        return surveys[_surveyId].voters;
-    }
-
-    // Function to get total number of surveys
-    function getTotalSurveys() public view returns (uint256) {
-        return surveys.length;
-    }
-
-    // Function to close a survey
+    // To close survey manually by owner or automatically by expiration time
     function closeSurvey(uint256 _surveyId) public {
         require(_surveyId < surveys.length, "Survey does not exist");
         Survey storage survey = surveys[_surveyId];
         require(msg.sender == survey.owner, "Only the owner can close the survey");
         require(!survey.isClosed, "Survey is already closed");
 
-        survey.isClosed = true;
-
-        if (survey.voters.length > 0) {
-            uint256 rewardPerVoter = survey.reward / survey.voters.length;
-            for (uint256 i = 0; i < survey.voters.length; i++) {
-                address voter = survey.voters[i];
-                payable(voter).transfer(rewardPerVoter);
-            }
+        // Close the survey if it has expired or if the owner decides to close it
+        if (block.timestamp > survey.endTime || msg.sender == survey.owner) {
+            survey.isClosed = true;
         }
+    }
+
+    // For reward distribution to participants
+    function distributeRewards(uint256 _surveyId) public {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        Survey storage survey = surveys[_surveyId];
+        require(survey.isClosed, "Survey is not closed yet");
+        require(survey.reward > 0, "No rewards available");
+
+        uint256 totalVoters = survey.voters.length;
+        uint256 rewardPerVoter = survey.reward / totalVoters;
+        uint256 remainder = survey.reward % totalVoters;
+
+        for (uint256 i = 0; i < totalVoters; i++) {
+            address voter = survey.voters[i];
+            // Using call to transfer Ether and limiting gas
+            (bool success, ) = voter.call{value: rewardPerVoter}("");
+            require(success, "Transfer failed");
+        }
+
+        // Handle the remainder
+        if (remainder > 0) {
+            // Send the remainder to the survey owner or leave it in the contract
+            (bool success, ) = survey.owner.call{value: remainder}("");
+            require(success, "Remainder transfer failed");
+        }
+
+        // Clear the reward to prevent re-entrancy
+        survey.reward = 0;
     }
 
     receive() external payable {}

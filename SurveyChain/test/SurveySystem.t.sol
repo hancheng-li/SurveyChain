@@ -134,7 +134,7 @@ contract SurveySystemTest is Test {
         vm.expectRevert("Only registered users can create a survey");
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
-    
+
     function testOwnerCannotVoteInOwnSurvey() public {
         // Set up survey parameters
         string memory description = "Test Survey";
@@ -167,39 +167,48 @@ contract SurveySystemTest is Test {
         choices[0] = "Option 1";
         choices[1] = "Option 2";
         uint256 duration = 1 weeks;
-        uint256 maxVotes = 100;
+        uint256 maxVotes = 3; // Reduced to 3 for easier testing
         uint256 reward = 10 ether;
 
-        // Register the user
+        // Register the user who will create the survey
         address user = address(this);
         vm.prank(user);
         surveySystem.registerUser("TestUser");
-
-        // Register another user for voting
-        address voter = address(0x2);
-        vm.prank(voter);
-        surveySystem.registerUser("VoterUser");
 
         // Simulate a registered user creating a survey
         vm.prank(user);
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
-        // Simulate voting by another user
-        vm.prank(voter);
+        // Unregistered users participating in the survey
+        address voter1 = address(0x2);
+        address voter2 = address(0x3);
+        address voter3 = address(0x4);
+
+        // Simulate voting by unregistered users
+        vm.prank(voter1);
+        surveySystem.vote(0, 0);
+        vm.prank(voter2);
+        surveySystem.vote(0, 1);
+        vm.prank(voter3);
         surveySystem.vote(0, 0);
 
-        // Retrieve and verify survey details
+        // Retrieve and verify survey details after voting
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.votes[0], 1);
-        assertEq(survey.votes[1], 0);
+        assertEq(survey.votes[0], 2, "Option 1 should have 2 votes");
+        assertEq(survey.votes[1], 1, "Option 2 should have 1 vote");
 
-        // Verify that the user is recorded as a voter
-        assertEq(survey.voters.length, 1);
-        assertEq(survey.voters[0], voter);
+        // Verify that all voters are recorded
+        assertEq(survey.voters.length, 3, "There should be 3 voters");
+        assertEq(survey.voters[0], voter1, "Voter1 should be recorded correctly");
+        assertEq(survey.voters[1], voter2, "Voter2 should be recorded correctly");
+        assertEq(survey.voters[2], voter3, "Voter3 should be recorded correctly");
+
+        // Verify that the survey is closed after reaching max votes
+        assertEq(survey.isClosed, true, "Survey should be closed after reaching max votes");
 
         // Attempt to vote again and expect failure
-        vm.prank(voter);
-        vm.expectRevert("You have already voted");
+        vm.prank(voter1);
+        vm.expectRevert("Survey is closed");
         surveySystem.vote(0, 1);
     }
 
@@ -228,32 +237,117 @@ contract SurveySystemTest is Test {
         vm.expectRevert("Only the owner can close the survey");
         surveySystem.closeSurvey(0);
     }
-
-    function testOwnerCanCloseSurvey() public {
+    
+    function testSurveyExpiration() public {
         // Set up survey parameters
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
         choices[1] = "Option 2";
-        uint256 duration = 1 weeks;
+        uint256 duration = 1 days; // 1 day duration
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
-        // Register the user
-        address user = address(this);
-        vm.prank(user);
-        surveySystem.registerUser("TestUser");
+        // Register the user who will create the survey
+        address surveyOwner = address(this);
+        vm.prank(surveyOwner);
+        surveySystem.registerUser("SurveyOwner");
 
-        // Simulate a registered user creating a survey
-        vm.prank(user);
+        // Create the survey
+        vm.prank(surveyOwner);
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
-        // Simulate the owner closing the survey
-        vm.prank(user);
+        // Fast forward time to after the survey expiration
+        vm.warp(block.timestamp + 2 days);
+
+        // Check and close the expired survey
+        vm.prank(surveyOwner);
         surveySystem.closeSurvey(0);
 
-        // Verify the survey is closed
+        // Verify that the survey is closed
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true);
+        assertEq(survey.isClosed, true, "Survey should be closed after expiration");
+    }
+
+    function testOwnerClosesSurveyManually() public {
+        // Set up survey parameters
+        string memory description = "Test Survey";
+        string[] memory choices = new string[](2);
+        choices[0] = "Option 1";
+        choices[1] = "Option 2";
+        uint256 duration = 1 days; // 1 day duration
+        uint256 maxVotes = 100;
+        uint256 reward = 10 ether;
+
+        // Register the user who will create the survey
+        address surveyOwner = address(this);
+        vm.prank(surveyOwner);
+        surveySystem.registerUser("SurveyOwner");
+
+        // Create the survey
+        vm.prank(surveyOwner);
+        surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
+
+        // Attempt to close the survey before expiration
+        vm.prank(surveyOwner);
+        surveySystem.closeSurvey(0);
+
+        // Verify that the survey is closed
+        SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
+        assertEq(survey.isClosed, true, "Survey should be closed by the owner before expiration");
+    }
+
+    function testDistributeRewards() public {
+        // Set up survey parameters
+        string memory description = "Test Survey";
+        string[] memory choices = new string[](2);
+        choices[0] = "Option 1";
+        choices[1] = "Option 2";
+        uint256 duration = 1 days; // 1 day duration
+        uint256 maxVotes = 100;
+        uint256 reward = 10 ether;
+
+        // Register the user who will create the survey
+        address surveyOwner = address(this);
+        vm.prank(surveyOwner);
+        surveySystem.registerUser("SurveyOwner");
+
+        // Create the survey
+        vm.prank(surveyOwner);
+        surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
+
+        // Register two voters
+        address voter1 = address(0x1);
+        address voter2 = address(0x2);
+        vm.prank(voter1);
+        surveySystem.registerUser("Voter1");
+        vm.prank(voter2);
+        surveySystem.registerUser("Voter2");
+
+        // Voters vote in the survey
+        vm.prank(voter1);
+        surveySystem.vote(0, 0);
+        vm.prank(voter2);
+        surveySystem.vote(0, 1);
+
+        // Fast forward time to after the survey expiration
+        vm.warp(block.timestamp + 2 days);
+
+        // Check and close the expired survey
+        vm.prank(surveyOwner);
+        surveySystem.closeSurvey(0);
+
+        // Verify initial balances
+        uint256 initialBalance1 = voter1.balance;
+        uint256 initialBalance2 = voter2.balance;
+
+        // Distribute rewards
+        vm.prank(surveyOwner);
+        surveySystem.distributeRewards(0);
+
+        // Verify that each voter received the correct reward
+        uint256 expectedRewardPerVoter = reward / 2;
+        assertEq(voter1.balance, initialBalance1 + expectedRewardPerVoter, "Voter1 did not receive the correct reward");
+        assertEq(voter2.balance, initialBalance2 + expectedRewardPerVoter, "Voter2 did not receive the correct reward");
     }
 }
