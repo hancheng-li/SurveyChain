@@ -13,8 +13,8 @@ contract VotingTest is Test {
         vm.deal(voter, 10 ether); // Fund the non-owner voter with ether
     }
 
+    // Test scenario: Vote in a survey with valid parameters
     function testVote() public {
-        // Test scenario: Vote in a survey with valid parameters
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -39,16 +39,16 @@ contract VotingTest is Test {
         assertEq(surveySystem.hasVoted(0, voter), true);
     }
 
+    // Test scenario: Attempt to vote in a non-existent survey
     function testVoteInvalidSurvey() public {
-        // Test scenario: Attempt to vote in a non-existent survey
         uint256 invalidSurveyId = 999;
         vm.prank(voter);
         vm.expectRevert(bytes("Survey does not exist"));
         surveySystem.vote(invalidSurveyId, 0);
     }
 
+    // Test scenario: Attempt to vote before the survey starts
     function testVoteBeforeStart() public {
-        // Test scenario: Attempt to vote before the survey starts
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -69,8 +69,8 @@ contract VotingTest is Test {
         surveySystem.vote(0, 0);
     }
 
+    // Test scenario: Attempt to vote after the survey ends
     function testVoteAfterEnd() public {
-        // Test scenario: Attempt to vote after the survey ends
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -91,8 +91,8 @@ contract VotingTest is Test {
         surveySystem.vote(0, 0);
     }
 
+    // Test scenario: Attempt to vote with an invalid choice
     function testVoteInvalidChoice() public {
-        // Test scenario: Attempt to vote with an invalid choice
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -110,8 +110,8 @@ contract VotingTest is Test {
         surveySystem.vote(0, 999); // Invalid choice
     }
 
+    // Test scenario: Attempt to vote twice
     function testVoteTwice() public {
-        // Test scenario: Attempt to vote twice
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -133,8 +133,8 @@ contract VotingTest is Test {
         surveySystem.vote(0, 1);
     }
 
+    // Test scenario: Owner attempts to vote in their own survey
     function testOwnerCannotVote() public {
-        // Test scenario: Owner attempts to vote in their own survey
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -151,8 +151,8 @@ contract VotingTest is Test {
         surveySystem.vote(0, 0);
     }
 
+    // Test scenario: Survey automatically closes after reaching max votes
     function testCloseSurveyAfterMaxVotes() public {
-        // Test scenario: Survey automatically closes after reaching max votes
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";

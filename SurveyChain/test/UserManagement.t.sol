@@ -11,8 +11,8 @@ contract UserManagementTest is Test {
         surveySystem = new SurveySystem();
     }
 
+    // Test scenario: Register a user with a valid username
     function testRegisterUser() public {
-        // Test scenario: Register a user with a valid username
         address user = address(0x123);
         string memory username = "Alice";
 
@@ -30,8 +30,8 @@ contract UserManagementTest is Test {
         assertEq(surveySystem.usernames(user), username, "Username should be Alice");
     }
 
-    function testRegisterUserEmptyUsername() public {
-        // Test scenario: Try to register a user with an empty username
+    // Test scenario: Do not allow user registration with an empty username
+    function testDisallowRegisterUserEmptyUsername() public {
         address user = address(0x456);
 
         // Attempt to register with an empty username
@@ -40,8 +40,8 @@ contract UserManagementTest is Test {
         surveySystem.registerUser("");
     }
 
-    function testRegisterUserMultipleTimes() public {
-        // Test scenario: Register a user multiple times with different usernames
+    // Test scenario: Do not allow user registration multiple times with different usernames
+    function testDisallowRegisterUserMultipleTimes() public {
         address user = address(0x789);
         string memory username1 = "Bob";
         string memory username2 = "Charlie";
@@ -63,8 +63,8 @@ contract UserManagementTest is Test {
         assertEq(surveySystem.usernames(user), username2, "Username should be Charlie after second registration");
     }
 
+    // Test scenario: Ensure duplicate usernames are not allowed
     function testRegisterUserWithDuplicateUsername() public {
-        // Test scenario: Ensure duplicate usernames are not allowed
         address user1 = address(0xAAA);
         address user2 = address(0xBBB);
         string memory username = "DuplicateUser";

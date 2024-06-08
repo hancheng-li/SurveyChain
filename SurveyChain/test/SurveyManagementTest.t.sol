@@ -11,8 +11,8 @@ contract SurveyManagementTest is Test {
         surveySystem = new SurveySystem();
     }
 
+    // Test scenario: Create a survey with valid parameters
     function testCreateSurvey() public {
-        // Test scenario: Create a survey with valid parameters
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -46,8 +46,8 @@ contract SurveyManagementTest is Test {
         assertEq(survey.voters.length, 0);
     }
 
+    // Test scenario: Attempt to create a survey without choices
     function testCreateSurveyWithoutChoices() public {
-        // Test scenario: Attempt to create a survey without choices
         string memory description = "Test Survey";
         string[] memory choices = new string[](0); // No choices
         uint256 duration = 1 weeks;
@@ -59,8 +59,8 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
+    // Test scenario: Attempt to create a survey with zero duration
     function testCreateSurveyWithZeroDuration() public {
-        // Test scenario: Attempt to create a survey with zero duration
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -74,8 +74,8 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
+    // Test scenario: Attempt to create a survey with zero max votes
     function testCreateSurveyWithZeroMaxVotes() public {
-        // Test scenario: Attempt to create a survey with zero max votes
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -89,8 +89,8 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
+    // Test scenario: Attempt to create a survey with zero reward
     function testCreateSurveyWithZeroReward() public {
-        // Test scenario: Attempt to create a survey with zero reward
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -104,8 +104,8 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
+    // Test scenario: Attempt to create a survey with invalid reward (mismatch between msg.value and reward)
     function testCreateSurveyWithInvalidReward() public {
-        // Test scenario: Attempt to create a survey with invalid reward (mismatch between msg.value and reward)
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -119,8 +119,8 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward - 1}(description, choices, duration, maxVotes, reward); // Sending less ether than reward
     }
 
+    // Test scenario: Close a survey by the owner
     function testCloseSurveyManuallyByOwner() public {
-        // Test scenario: Close a survey by the owner
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -140,6 +140,7 @@ contract SurveyManagementTest is Test {
         assertEq(survey.isClosed, true, "Survey should be closed");
     }
 
+    // Test scenario: Ensure Non-Owners cannot close a survey
     function testNonOwnerCantCloseSurvey() public {
         // Set up survey parameters
         string memory description = "Test Survey";
@@ -166,8 +167,8 @@ contract SurveyManagementTest is Test {
         surveySystem.closeSurvey(0);
     }
 
+    // Test scenario: Close a survey automatically after expiration
     function testSurveyExpiration() public {
-        // Test scenario: Close a survey automatically after expiration
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
