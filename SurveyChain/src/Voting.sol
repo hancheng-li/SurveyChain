@@ -17,6 +17,12 @@ contract Voting is SurveyManagement {
         require(!hasVoted[_surveyId][msg.sender], "You have already voted");
         require(msg.sender != survey.owner, "Survey owner cannot vote in their own survey");
 
+        // If the survey has expired, close it
+        if (block.timestamp > survey.endTime) {
+            survey.isClosed = true;
+            return;
+        }
+        
         survey.votes[_choice]++;
         survey.voters.push(msg.sender);
         hasVoted[_surveyId][msg.sender] = true;
