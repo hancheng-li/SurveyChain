@@ -13,7 +13,7 @@ contract VotingTest is Test {
         vm.deal(voter, 10 ether); // Fund the non-owner voter with ether
     }
 
-    // Test scenario: Vote in a survey with valid parameters
+    // Test 1: Vote in a survey with valid parameters
     function testVote() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -39,7 +39,7 @@ contract VotingTest is Test {
         assertEq(surveySystem.hasVoted(0, voter), true);
     }
 
-    // Test scenario: Attempt to vote in a non-existent survey
+    // Test 2: Attempt to vote in a non-existent survey
     function testVoteInvalidSurvey() public {
         uint256 invalidSurveyId = 999;
         vm.prank(voter);
@@ -47,7 +47,7 @@ contract VotingTest is Test {
         surveySystem.vote(invalidSurveyId, 0);
     }
 
-    // Test scenario: Attempt to vote before the survey starts
+    // Test 3: Attempt to vote before the survey starts
     function testVoteBeforeStart() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -69,7 +69,7 @@ contract VotingTest is Test {
         surveySystem.vote(0, 0);
     }
 
-    // Test scenario: Attempt to vote after the survey ends
+    // Test 4: Attempt to vote after the survey ends
     function testVoteAfterEnd() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -91,7 +91,7 @@ contract VotingTest is Test {
         surveySystem.vote(0, 0);
     }
 
-    // Test scenario: Attempt to vote with an invalid choice
+    // Test 5: Attempt to vote with an invalid choice
     function testVoteInvalidChoice() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -110,7 +110,7 @@ contract VotingTest is Test {
         surveySystem.vote(0, 999); // Invalid choice
     }
 
-    // Test scenario: Attempt to vote twice
+    // Test 6: Attempt to vote twice
     function testVoteTwice() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -133,7 +133,7 @@ contract VotingTest is Test {
         surveySystem.vote(0, 1);
     }
 
-    // Test scenario: Owner attempts to vote in their own survey
+    // Test 7: Owner attempts to vote in their own survey
     function testOwnerCannotVote() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -151,7 +151,7 @@ contract VotingTest is Test {
         surveySystem.vote(0, 0);
     }
 
-    // Test scenario: Survey automatically closes after reaching max votes
+    // Test 8: Survey automatically closes after reaching max votes
     function testCloseSurveyAfterMaxVotes() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);

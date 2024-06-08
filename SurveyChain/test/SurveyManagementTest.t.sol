@@ -11,7 +11,7 @@ contract SurveyManagementTest is Test {
         surveySystem = new SurveySystem();
     }
 
-    // Test scenario: Create a survey with valid parameters
+    // Test 1: Create a survey with valid parameters
     function testCreateSurvey() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -46,7 +46,7 @@ contract SurveyManagementTest is Test {
         assertEq(survey.voters.length, 0);
     }
 
-    // Test scenario: Attempt to create a survey without choices
+    // Test 2: Attempt to create a survey without choices
     function testCreateSurveyWithoutChoices() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](0); // No choices
@@ -59,7 +59,7 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test scenario: Attempt to create a survey with zero duration
+    // Test 3: Attempt to create a survey with zero duration
     function testCreateSurveyWithZeroDuration() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -74,7 +74,7 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test scenario: Attempt to create a survey with zero max votes
+    // Test 4: Attempt to create a survey with zero max votes
     function testCreateSurveyWithZeroMaxVotes() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -89,7 +89,7 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test scenario: Attempt to create a survey with zero reward
+    // Test 5: Attempt to create a survey with zero reward
     function testCreateSurveyWithZeroReward() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -104,7 +104,7 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test scenario: Attempt to create a survey with invalid reward (mismatch between msg.value and reward)
+    // Test 6: Attempt to create a survey with invalid reward (mismatch between msg.value and reward)
     function testCreateSurveyWithInvalidReward() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -119,7 +119,7 @@ contract SurveyManagementTest is Test {
         surveySystem.createSurvey{value: reward - 1}(description, choices, duration, maxVotes, reward); // Sending less ether than reward
     }
 
-    // Test scenario: Close a survey by the owner
+    // Test 7: Close a survey by the owner
     function testCloseSurveyManuallyByOwner() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -140,7 +140,7 @@ contract SurveyManagementTest is Test {
         assertEq(survey.isClosed, true, "Survey should be closed");
     }
 
-    // Test scenario: Ensure Non-Owners cannot close a survey
+    // Test 8: Ensure Non-Owners cannot close a survey
     function testNonOwnerCantCloseSurvey() public {
         // Set up survey parameters
         string memory description = "Test Survey";
@@ -167,7 +167,7 @@ contract SurveyManagementTest is Test {
         surveySystem.closeSurvey(0);
     }
 
-    // Test scenario: Close a survey automatically after expiration
+    // Test 9: Close a survey automatically after expiration
     function testSurveyExpiration() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);

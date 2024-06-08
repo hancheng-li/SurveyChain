@@ -18,7 +18,7 @@ contract RewardDistributionTest is Test {
         vm.deal(address(this), 10 ether); // Fund the contract itself with some ether
     }
 
-    // Test scenario: Distribute rewards to participants
+    // Test 1: Distribute rewards to participants
     function testDistributeRewards() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -59,7 +59,7 @@ contract RewardDistributionTest is Test {
         assertEq(survey.reward, 0, "Survey reward should be cleared");
     }
 
-    // Test scenario: Distribute rewards with a remainder that returns back to the owner
+    // Test 2: Distribute rewards with a remainder that returns back to the owner
     function testDistributeRewardsWithRemainder() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -104,7 +104,7 @@ contract RewardDistributionTest is Test {
         assertEq(survey.reward, 0, "Survey reward should be cleared");
     }
 
-    // Test scenario: Attempt to distribute rewards for a survey that is not closed
+    // Test 3: Attempt to distribute rewards for a survey that is not closed
     function testDistributeRewardsNotClosed() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -122,7 +122,7 @@ contract RewardDistributionTest is Test {
         surveySystem.distributeRewards(0);
     }
 
-    // Test scenario: Attempt to distribute rewards for a survey with no reward, survey isn't created
+    // Test 4: Attempt to distribute rewards for a survey with no reward, survey isn't created
     function testDistributeRewardsNoReward() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
