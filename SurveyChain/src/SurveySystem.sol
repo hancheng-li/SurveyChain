@@ -5,6 +5,4 @@ import "./UserManagement.sol";
 import "./Voting.sol";
 import "./RewardDistribution.sol";
 
-contract SurveySystem is UserManagement, Voting, RewardDistribution {
-
-}
+contract SurveySystem is UserManagement, Voting, RewardDistribution {}

@@ -21,8 +21,8 @@ contract Voting is SurveyManagement {
         survey.voters.push(msg.sender);
         hasVoted[_surveyId][msg.sender] = true;
 
-        // Close the survey if max votes reached
-        if (survey.voters.length >= survey.maxVotes) {
+        // Close the survey if max votes reached or if expired
+        if (survey.voters.length >= survey.maxVotes || block.timestamp > survey.endTime) {
             survey.isClosed = true;
         }
     }
