@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
 import {SurveySystem} from "../src/SurveySystem.sol";
+import {Reentracy_Attacker, Attacker} from "./Attacker.sol";
 
 contract SurveySystemTest is Test {
     SurveySystem public surveySystem;
@@ -36,7 +37,7 @@ contract SurveySystemTest is Test {
         assertEq(survey.endTime, block.timestamp + duration);
         assertEq(survey.maxVotes, maxVotes);
         assertEq(survey.reward, reward);
-        assertEq(survey.isClosed, false);
+        assertEq(survey.isClosed, 1);
         assertEq(survey.owner, user);
 
         // Verify that the votes array is initialized correctly
@@ -75,7 +76,7 @@ contract SurveySystemTest is Test {
         assertEq(survey.endTime, block.timestamp + duration);
         assertEq(survey.maxVotes, maxVotes);
         assertEq(survey.reward, reward);
-        assertEq(survey.isClosed, false);
+        assertEq(survey.isClosed, 1);
         assertEq(survey.owner, user);
 
         // Verify that the votes array is initialized correctly
@@ -161,6 +162,77 @@ contract SurveySystemTest is Test {
 
         // Verify the survey is closed
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true);
+        assertEq(survey.isClosed, 2);
+    }
+
+    function test_unregistered_user_create_survey_attack() public {
+        // Simulate an unregistered user creating a survey
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.unregistered_user_create_survey_attack();
+        vm.expectRevert("Only registered users can create surveys");
+    }
+
+    function test_create_time_overflow_survey_attack() public{
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.time_overflow_attack();
+        vm.expectRevert("Duration overflow");
+    }
+
+    function test_sybil_attack_1() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.sybil_attack_1();
+        vm.expectRevert("You have already voted");
+    }
+
+    function test_sybil_attack_2() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.sybil_attack_2();
+        vm.expectRevert("Survey is not closed yet");
+    }
+
+    function test_reentrancy_attack() public {
+        Reentracy_Attacker attacker = new Reentracy_Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.reentrancy_attack();
+        vm.expectRevert("Survey is already closed");
+    }
+
+    function test_create_survey_free() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.create_survey_free_attack();
+        vm.expectRevert("Reward must be greater than zero");
+    }
+
+    function test_double_retrieval_1() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.double_retrieval_attack_1();
+        vm.expectRevert("No rewards available");
+    }
+
+    function test_double_retrieval_2() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.double_retrieval_attack_2();
+        vm.expectRevert("No rewards available");
+    }
+
+    function test_divide_by_zero() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.divide_by_zero_attack();
+        assertEq(address(attacker).balance, 10 ether);
+    }
+
+    function test_owner_vote() public {
+        Attacker attacker = new Attacker(surveySystem);
+        deal(address(attacker), 10 ether);
+        attacker.owner_vote_attack();
+        vm.expectRevert("Owner cannot vote");
     }
 }
