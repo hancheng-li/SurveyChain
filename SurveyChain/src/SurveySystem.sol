@@ -6,7 +6,13 @@ import "./Voting.sol";
 import "./RewardDistribution.sol";
 import "./SurveyManagement.sol";
 
-contract SurveySystem is UserManagement, 
-                        SurveyManagement, 
-                        Voting,
-                        RewardDistribution {}
+contract SurveySystem is 
+    UserManagement, SurveyManagement, 
+    Voting, RewardDistribution {
+        
+    // Helper function for testing to set roles
+    function setRole(address user, uint256 role) external {
+        roles[user] = role;
+        isRegistered[user] = (role == 0); // Update isRegistered based on role
+    }
+}

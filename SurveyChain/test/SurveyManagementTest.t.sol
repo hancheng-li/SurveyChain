@@ -9,9 +9,11 @@ contract SurveyManagementTest is Test {
 
     function setUp() public {
         surveySystem = new SurveySystem();
+        // Explicitly set test contract addresses to unregistered initially
+        surveySystem.setRole(address(this), 1);
     }
 
-    // Test 1: Create a survey with valid parameters
+    // Test 1: Create a survey with valid parameters by a registered user
     function testCreateSurvey() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -20,6 +22,9 @@ contract SurveyManagementTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
+
+        // Register the user
+        surveySystem.registerUser("TestUser");
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -46,7 +51,7 @@ contract SurveyManagementTest is Test {
         assertEq(survey.voters.length, 0);
     }
 
-    // Test 2: Attempt to create a survey without choices
+    // Test 2: Attempt to create a survey without choices by a registered user
     function testCreateSurveyWithoutChoices() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](0); // No choices
@@ -54,12 +59,15 @@ contract SurveyManagementTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
+        // Register the user
+        surveySystem.registerUser("TestUser");
+
         // Expect revert due to lack of choices
         vm.expectRevert(bytes("Survey must have at least one choice"));
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test 3: Attempt to create a survey with zero duration
+    // Test 3: Attempt to create a survey with zero duration by a registered user
     function testCreateSurveyWithZeroDuration() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -69,12 +77,15 @@ contract SurveyManagementTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
+        // Register the user
+        surveySystem.registerUser("TestUser");
+
         // Expect revert due to zero duration
-        vm.expectRevert(bytes("Survey duration must be greater than zero"));
+        vm.expectRevert(bytes("Survey duration must be greater than zero and less than maximum duration"));
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test 4: Attempt to create a survey with zero max votes
+    // Test 4: Attempt to create a survey with zero max votes by a registered user
     function testCreateSurveyWithZeroMaxVotes() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -84,12 +95,15 @@ contract SurveyManagementTest is Test {
         uint256 maxVotes = 0; // Zero max votes
         uint256 reward = 10 ether;
 
+        // Register the user
+        surveySystem.registerUser("TestUser");
+
         // Expect revert due to zero max votes
         vm.expectRevert(bytes("Max votes must be greater than zero"));
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test 5: Attempt to create a survey with zero reward
+    // Test 5: Attempt to create a survey with zero reward by a registered user
     function testCreateSurveyWithZeroReward() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -99,12 +113,15 @@ contract SurveyManagementTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 0; // Zero reward
 
+        // Register the user
+        surveySystem.registerUser("TestUser");
+
         // Expect revert due to zero reward
         vm.expectRevert(bytes("Reward must be greater than zero"));
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
-    // Test 6: Attempt to create a survey with invalid reward (mismatch between msg.value and reward)
+    // Test 6: Attempt to create a survey with invalid reward (mismatch between msg.value and reward) by a registered user
     function testCreateSurveyWithInvalidReward() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
@@ -113,6 +130,9 @@ contract SurveyManagementTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
+
+        // Register the user
+        surveySystem.registerUser("TestUser");
 
         // Expect revert due to reward value mismatch
         vm.expectRevert(bytes("Reward value must be sent"));
@@ -128,6 +148,9 @@ contract SurveyManagementTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
+
+        // Register the user
+        surveySystem.registerUser("TestUser");
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -152,12 +175,9 @@ contract SurveyManagementTest is Test {
         uint256 reward = 10 ether;
 
         // Register the user
-        address user = address(this);
-        vm.prank(user);
         surveySystem.registerUser("TestUser");
 
         // Simulate a registered user creating a survey
-        vm.prank(user);
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
         // Attempt to close the survey by a non-owner and expect failure
@@ -177,6 +197,9 @@ contract SurveyManagementTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
+        // Register the user
+        surveySystem.registerUser("TestUser");
+
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
@@ -190,4 +213,23 @@ contract SurveyManagementTest is Test {
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
         assertEq(survey.isClosed, true, "Survey should be closed after expiration");
     }
+
+    // Test 10: Attempt to create a survey by an unregistered user
+    function testUnregisteredUserCannotCreateSurvey() public {
+        string memory description = "Test Survey";
+        string[] memory choices = new string[](2);
+        choices[0] = "Option 1";
+        choices[1] = "Option 2";
+        uint256 duration = 1 weeks;
+        uint256 maxVotes = 100;
+        uint256 reward = 10 ether;
+
+        // Ensure the user is not registered
+        assertEq(surveySystem.roles(address(this)), 1, "User should be unregistered");
+
+        // Expect revert due to user not being registered
+        vm.expectRevert(bytes("Only registered users can create a survey"));
+        surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
+    }
+
 }

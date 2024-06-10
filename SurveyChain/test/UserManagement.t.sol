@@ -9,6 +9,8 @@ contract UserManagementTest is Test {
 
     function setUp() public {
         surveySystem = new SurveySystem();
+        // Explicitly set test contract addresses to unregistered initially
+        surveySystem.setRole(address(this), 1);
     }
 
     // Test 1: Register a user with a valid username
@@ -54,13 +56,10 @@ contract UserManagementTest is Test {
         assertEq(surveySystem.roles(user), 0, "Role should be 0 (Registered User) after first registration");
         assertEq(surveySystem.usernames(user), username1, "Username should be Bob after first registration");
 
-        // Register the user again with a different username
+        // Attempt to register the user again with a different username, expect it to revert
         vm.prank(user);
+        vm.expectRevert("Your address is already registered with a different username");
         surveySystem.registerUser(username2);
-
-        // Verify that the username is updated
-        assertEq(surveySystem.roles(user), 0, "Role should remain 0 (Registered User) after second registration");
-        assertEq(surveySystem.usernames(user), username2, "Username should be Charlie after second registration");
     }
 
     // Test 4: Ensure duplicate usernames are not allowed
@@ -77,5 +76,24 @@ contract UserManagementTest is Test {
         vm.prank(user2);
         vm.expectRevert(bytes("Username already taken"));
         surveySystem.registerUser(username);
+    }
+
+    // Test 5: Ensure an address can only register once with a unique username
+    function testSingleRegistrationPerAddress() public {
+        address user = address(0xCCC);
+        string memory username = "UniqueUser";
+
+        // Register the user with a unique username
+        vm.prank(user);
+        surveySystem.registerUser(username);
+
+        // Verify the registration
+        assertEq(surveySystem.isRegistered(user), true, "User should be registered after registration");
+        assertEq(surveySystem.usernames(user), username, "Username should be UniqueUser after registration");
+
+        // Attempt to register the user again with a different username
+        vm.prank(user);
+        vm.expectRevert(bytes("Your address is already registered with a different username"));
+        surveySystem.registerUser("AnotherUsername");
     }
 }

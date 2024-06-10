@@ -11,6 +11,14 @@ contract VotingTest is Test {
     function setUp() public {
         surveySystem = new SurveySystem();
         vm.deal(voter, 10 ether); // Fund the non-owner voter with ether
+        // Explicitly set test contract addresses to unregistered initially
+        surveySystem.setRole(address(this), 1);
+
+        // Register the users
+        vm.prank(voter);
+        surveySystem.registerUser("Voter");
+
+        surveySystem.registerUser("Owner");
     }
 
     // Test 1: Vote in a survey with valid parameters
@@ -22,6 +30,11 @@ contract VotingTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
+
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -57,6 +70,11 @@ contract VotingTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
+
         // Create the survey with a future start time
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
@@ -78,6 +96,11 @@ contract VotingTest is Test {
         uint256 duration = 1 days; // 1 day duration
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
+
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -101,6 +124,11 @@ contract VotingTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
+
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
@@ -119,6 +147,11 @@ contract VotingTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
+
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -143,6 +176,11 @@ contract VotingTest is Test {
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
+
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
@@ -160,6 +198,11 @@ contract VotingTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 1; // Set max votes to 1 for testing
         uint256 reward = 10 ether;
+
+        // Ensure the creator (address(this)) is registered
+        if (!surveySystem.isRegistered(address(this))) {
+            surveySystem.registerUser("Creator");
+        }
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
