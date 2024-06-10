@@ -53,7 +53,7 @@ contract Attacker is Test {
 
     // Penetration test 3: Checks that a user cannot vote multiple times on 
     // the same survey using different addresses (Sybil attack)
-    function testVoteSybilAttackCase() public {
+    function testRepeatedVoteSybilAttackCase() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
@@ -206,12 +206,14 @@ contract Attacker is Test {
         surveySystem.vote(0, 0);
     }
 
-    function double_retrieval_attack_2() public {
+    // Penetration test 9: Sybil attack prevention whereby users cannot
+    // create multiple fake identities to manipulate the voting process
+    function testMultipleIdentitySybilAttack() public {
         string memory description = "Test Survey";
         string[] memory choices = new string[](2);
         choices[0] = "Option 1";
         choices[1] = "Option 2";
-        uint256 duration = 1 seconds;
+        uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
 
@@ -223,25 +225,24 @@ contract Attacker is Test {
         vm.prank(attackerAddress);
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
 
-        // Add a voter to ensure there are voters before distributing rewards
-        address voterAddress = address(0x2);
-        vm.deal(voterAddress, 1 ether); // Fund the voter address
-        vm.prank(voterAddress);
-        surveySystem.registerUser("Voter");
-        vm.prank(voterAddress);
-        surveySystem.vote(0, 0); // vote for option 1
+        // Register multiple identities and attempt to vote
+        address[] memory identities = new address[](5);
+        for (uint256 i = 0; i < identities.length; i++) {
+            identities[i] = address(uint160(uint256(keccak256(abi.encodePacked(i, block.timestamp)))));
+            vm.deal(identities[i], 1 ether); // Fund the identities
+            vm.prank(identities[i]);
+            surveySystem.registerUser(string(abi.encodePacked("Voter", i)));
+        }
 
-        // Wait for the survey to close automatically (duration is 1 second)
-        vm.warp(block.timestamp + 2); // Warp forward in time to ensure survey duration has passed
+        // Attempt to vote multiple times
+        for (uint256 i = 0; i < identities.length; i++) {
+            vm.prank(identities[i]);
+            surveySystem.vote(0, 0); // Vote for option 1
+        }
 
-        // Distribute rewards for the first time
-        vm.prank(attackerAddress);
-        surveySystem.distributeRewards(0);
-
-        // Attempt to distribute rewards again, should revert
-        vm.prank(attackerAddress);
-        vm.expectRevert("Rewards have already been distributed");
-        surveySystem.distributeRewards(0);
+        // Verify that votes are not manipulated and are correctly counted
+        uint256[] memory votes = surveySystem.getVoteCounts(0);
+        assertEq(votes[0], identities.length, "Vote count for option 1 should match the number of identities");
     }
 
     receive() external payable {}

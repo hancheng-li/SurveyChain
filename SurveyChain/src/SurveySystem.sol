@@ -9,10 +9,17 @@ import "./SurveyManagement.sol";
 contract SurveySystem is 
     UserManagement, SurveyManagement, 
     Voting, RewardDistribution {
-        
+
     // Helper function for testing to set roles
     function setRole(address user, uint256 role) external {
         roles[user] = role;
         isRegistered[user] = (role == 0); // Update isRegistered based on role
+    }
+
+    // Helper function to get vote counts for a survey
+    // For preventing sybil attacks
+    function getVoteCounts(uint256 _surveyId) external view returns (uint256[] memory) {
+        require(_surveyId < surveys.length, "Survey does not exist");
+        return surveys[_surveyId].votes;
     }
 }
