@@ -24,7 +24,7 @@ contract SurveyManagement is UserManagement {
 
     // Function to create a new survey
     function createSurvey(string memory _description, string[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) public payable {
-        require(isRegistered[msg.sender], "Only registered users can create a survey");
+        require(roles[msg.sender] == 1, "Only registered users can create a survey");
         require(_choices.length > 0, "Survey must have at least one choice");
         require(duration > 0 && duration <= MAX_DURATION, "Survey duration must be greater than zero and less than maximum duration");
         require(_maxVotes > 0, "Max votes must be greater than zero");

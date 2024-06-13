@@ -16,19 +16,6 @@ contract RewardDistributionTest is Test {
         vm.deal(voter2, 1 ether);
         vm.deal(voter3, 1 ether);
         vm.deal(address(this), 10 ether); // Fund the contract itself with some ether
-        // Explicitly set test contract addresses to unregistered initially
-        surveySystem.setRole(address(this), 1);
-        // Register the users
-        vm.prank(voter1);
-        surveySystem.registerUser("Voter1");
-
-        vm.prank(voter2);
-        surveySystem.registerUser("Voter2");
-
-        vm.prank(voter3);
-        surveySystem.registerUser("Voter3");
-
-        surveySystem.registerUser("Owner");
     }
 
     // Test 1: Distribute rewards to participants
@@ -42,9 +29,7 @@ contract RewardDistributionTest is Test {
         uint256 reward = 9 ether;
 
         // Ensure the creator (address(this)) is registered
-        if (!surveySystem.isRegistered(address(this))) {
-            surveySystem.registerUser("Creator");
-        }
+        surveySystem.registerUser("Creator");
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -88,9 +73,7 @@ contract RewardDistributionTest is Test {
         uint256 reward = 5 ether; // Reward that will leave a remainder when divided by 2
 
         // Ensure the creator (address(this)) is registered
-        if (!surveySystem.isRegistered(address(this))) {
-            surveySystem.registerUser("Creator");
-        }
+        surveySystem.registerUser("Creator");
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -138,9 +121,7 @@ contract RewardDistributionTest is Test {
         uint256 reward = 5 ether;
 
         // Ensure the creator (address(this)) is registered
-        if (!surveySystem.isRegistered(address(this))) {
-            surveySystem.registerUser("Creator");
-        }
+        surveySystem.registerUser("Creator");
 
         // Create the survey
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
@@ -161,9 +142,7 @@ contract RewardDistributionTest is Test {
         uint256 reward = 0 ether;
 
         // Ensure the creator (address(this)) is registered
-        if (!surveySystem.isRegistered(address(this))) {
-            surveySystem.registerUser("Creator");
-        }
+        surveySystem.registerUser("Creator");
 
         // Create the survey
         vm.expectRevert(bytes("Reward must be greater than zero"));

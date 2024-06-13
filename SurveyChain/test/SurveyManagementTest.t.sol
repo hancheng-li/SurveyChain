@@ -9,8 +9,6 @@ contract SurveyManagementTest is Test {
 
     function setUp() public {
         surveySystem = new SurveySystem();
-        // Explicitly set test contract addresses to unregistered initially
-        surveySystem.setRole(address(this), 1);
     }
 
     // Test 1: Create a survey with valid parameters by a registered user
@@ -223,9 +221,6 @@ contract SurveyManagementTest is Test {
         uint256 duration = 1 weeks;
         uint256 maxVotes = 100;
         uint256 reward = 10 ether;
-
-        // Ensure the user is not registered
-        assertEq(surveySystem.roles(address(this)), 1, "User should be unregistered");
 
         // Expect revert due to user not being registered
         vm.expectRevert(bytes("Only registered users can create a survey"));

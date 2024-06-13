@@ -9,8 +9,6 @@ contract UserManagementTest is Test {
 
     function setUp() public {
         surveySystem = new SurveySystem();
-        // Explicitly set test contract addresses to unregistered initially
-        surveySystem.setRole(address(this), 1);
     }
 
     // Test 1: Register a user with a valid username
@@ -18,9 +16,8 @@ contract UserManagementTest is Test {
         address user = address(0x123);
         string memory username = "Alice";
 
-        // Initially, the roles mapping should not explicitly store any value for the user
-        // The default value should be zero, which represents "Registered User" in our contract.
-        assertEq(surveySystem.roles(user), 0, "Initial role should be 0 (Registered User)");
+        // Initially, the roles mapping should be 0 (Unregistered User)
+        assertEq(surveySystem.roles(user), 0, "Initial role should be 0 (Unregistered User)");
         assertEq(bytes(surveySystem.usernames(user)).length, 0, "Initial username should be empty");
 
         // Register the user
@@ -28,8 +25,9 @@ contract UserManagementTest is Test {
         surveySystem.registerUser(username);
 
         // Verify that the user is registered
-        assertEq(surveySystem.roles(user), 0, "Role should be 0 (Registered User)");
+        assertEq(surveySystem.roles(user), 1, "Role should be 1 (Registered User)");
         assertEq(surveySystem.usernames(user), username, "Username should be Alice");
+        assertEq(surveySystem.usernameTaken(username), 1, "Username should be marked as taken");
     }
 
     // Test 2: Do not allow user registration with an empty username
@@ -53,12 +51,12 @@ contract UserManagementTest is Test {
         surveySystem.registerUser(username1);
 
         // Verify the first registration
-        assertEq(surveySystem.roles(user), 0, "Role should be 0 (Registered User) after first registration");
+        assertEq(surveySystem.roles(user), 1, "Role should be 1 (Registered User) after first registration");
         assertEq(surveySystem.usernames(user), username1, "Username should be Bob after first registration");
 
         // Attempt to register the user again with a different username, expect it to revert
         vm.prank(user);
-        vm.expectRevert("Your address is already registered with a different username");
+        vm.expectRevert("User is already registered");
         surveySystem.registerUser(username2);
     }
 
@@ -74,7 +72,7 @@ contract UserManagementTest is Test {
 
         // Attempt to register the second user with the same username
         vm.prank(user2);
-        vm.expectRevert(bytes("Username already taken"));
+        vm.expectRevert(bytes("Username is already taken"));
         surveySystem.registerUser(username);
     }
 
@@ -88,12 +86,11 @@ contract UserManagementTest is Test {
         surveySystem.registerUser(username);
 
         // Verify the registration
-        assertEq(surveySystem.isRegistered(user), true, "User should be registered after registration");
         assertEq(surveySystem.usernames(user), username, "Username should be UniqueUser after registration");
 
         // Attempt to register the user again with a different username
         vm.prank(user);
-        vm.expectRevert(bytes("Your address is already registered with a different username"));
+        vm.expectRevert(bytes("User is already registered"));
         surveySystem.registerUser("AnotherUsername");
     }
 }

@@ -13,7 +13,6 @@ contract SurveySystem is
     // Helper function for testing to set roles
     function setRole(address user, uint256 role) external {
         roles[user] = role;
-        isRegistered[user] = (role == 0); // Update isRegistered based on role
     }
 
     // Helper function to get vote counts for a survey
