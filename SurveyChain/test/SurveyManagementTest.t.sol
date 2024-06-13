@@ -37,7 +37,7 @@ contract SurveyManagementTest is Test {
         assertEq(survey.endTime, block.timestamp + duration);
         assertEq(survey.maxVotes, maxVotes);
         assertEq(survey.reward, reward);
-        assertEq(survey.isClosed, false);
+        assertEq(survey.isClosed, 1); // Open
         assertEq(survey.owner, address(this));
 
         // Verify that the votes array is initialized correctly
@@ -79,7 +79,7 @@ contract SurveyManagementTest is Test {
         surveySystem.registerUser("TestUser");
 
         // Expect revert due to zero duration
-        vm.expectRevert(bytes("Survey duration must be greater than zero and less than maximum duration"));
+        vm.expectRevert(bytes("Survey duration must be greater than zero and less than maximum duration of 1 year"));
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
 
@@ -158,7 +158,7 @@ contract SurveyManagementTest is Test {
 
         // Retrieve and verify survey details
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true, "Survey should be closed");
+        assertEq(survey.isClosed, 2, "Survey should be closed");
     }
 
     // Test 8: Ensure Non-Owners cannot close a survey
@@ -209,7 +209,7 @@ contract SurveyManagementTest is Test {
 
         // Retrieve and verify survey details
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true, "Survey should be closed after expiration");
+        assertEq(survey.isClosed, 2, "Survey should be closed after expiration");
     }
 
     // Test 10: Attempt to create a survey by an unregistered user

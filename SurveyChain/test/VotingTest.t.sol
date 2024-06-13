@@ -191,6 +191,6 @@ contract VotingTest is Test {
 
         // Retrieve and verify survey details
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true, "Survey should be closed after reaching max votes");
+        assertEq(survey.isClosed, 2, "Survey should be closed after reaching max votes");
     }
 }

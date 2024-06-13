@@ -12,24 +12,24 @@ contract Voting is SurveyManagement {
         Survey storage survey = surveys[_surveyId];
         require(block.timestamp >= survey.startTime, "Survey has not started yet");
         require(block.timestamp <= survey.endTime, "Survey has ended");
-        require(!survey.isClosed, "Survey is closed");
+        require(survey.isClosed == 1, "Survey is closed");
         require(_choice < survey.choices.length, "Invalid choice");
         require(!hasVoted[_surveyId][msg.sender], "You have already voted");
         require(msg.sender != survey.owner, "Survey owner cannot vote in their own survey");
 
         // If the survey has expired, close it
         if (block.timestamp > survey.endTime) {
-            survey.isClosed = true;
+            survey.isClosed = 2; // Closed
             return;
         }
-        
+
         survey.votes[_choice]++;
         survey.voters.push(msg.sender);
         hasVoted[_surveyId][msg.sender] = true;
 
         // Close the survey if max votes reached or if expired
         if (survey.voters.length >= survey.maxVotes || block.timestamp > survey.endTime) {
-            survey.isClosed = true;
+            survey.isClosed = 2; // Closed
         }
     }
 }

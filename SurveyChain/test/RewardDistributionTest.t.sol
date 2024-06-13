@@ -46,7 +46,7 @@ contract RewardDistributionTest is Test {
 
         // Ensure the survey is closed before distributing rewards
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true, "Survey should be closed after reaching max votes");
+        assertEq(survey.isClosed, 2, "Survey should be closed after reaching max votes");
 
         // Distribute the rewards
         surveySystem.distributeRewards(0);
@@ -87,7 +87,7 @@ contract RewardDistributionTest is Test {
 
         // Ensure the survey is closed automatically after reaching max votes
         SurveySystem.Survey memory survey = surveySystem.getSurvey(0);
-        assertEq(survey.isClosed, true, "Survey should be closed after reaching max votes");
+        assertEq(survey.isClosed, 2, "Survey should be closed after reaching max votes");
 
         // Capture initial owner balance
         uint256 initialOwnerBalance = address(this).balance;
