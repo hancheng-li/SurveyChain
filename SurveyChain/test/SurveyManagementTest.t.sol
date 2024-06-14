@@ -226,5 +226,4 @@ contract SurveyManagementTest is Test {
         vm.expectRevert(bytes("Only registered users can create a survey"));
         surveySystem.createSurvey{value: reward}(description, choices, duration, maxVotes, reward);
     }
-
 }
