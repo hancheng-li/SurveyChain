@@ -9,7 +9,7 @@ contract RewardDistribution is SurveyManagement {
         require(_surveyId < surveys.length, "Survey does not exist");
         Survey storage survey = surveys[_surveyId];
         require(survey.isClosed == 2, "Survey is not closed yet");
-        require(!survey.rewardsDistributed, "Rewards have already been distributed");
+        require(survey.rewardsDistributed == 0, "Rewards have already been distributed");
         require(survey.reward > 0, "No rewards available");
         require(survey.voters.length > 0, "No voters to distribute rewards to");
 
@@ -31,8 +31,8 @@ contract RewardDistribution is SurveyManagement {
             require(success, "Remainder transfer failed");
         }
 
-        // Set the rewardsDistributed flag to true and clear the reward to prevent re-entrancy
-        survey.rewardsDistributed = true;
+        // Set the rewardsDistributed flag to 1 (yes) and clear the reward to prevent re-entrancy
+        survey.rewardsDistributed = 1; // Yes
         survey.reward = 0;
     }
 

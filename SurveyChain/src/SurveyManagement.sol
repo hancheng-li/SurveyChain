@@ -16,13 +16,22 @@ contract SurveyManagement is UserManagement {
         address[] voters;
         uint256 isClosed; // 1: Open, 2: Closed
         address owner;
-        bool rewardsDistributed;
+        uint256 rewardsDistributed; // 0: No, 1: Yes
     }
 
     uint256 public constant MAX_DURATION = 365 days; // Set a maximum duration limit of 1 year
     Survey[] public surveys;
 
-    // Function to create a new survey
+    /**
+     * @notice Creates a new survey.
+     * @dev Only registered users can create a survey. 
+     *      The caller must send the reward amount along with the transaction.
+     * @param _description The description of the survey.
+     * @param _choices The choices available in the survey.
+     * @param duration The duration of the survey in seconds.
+     * @param _maxVotes The maximum number of votes allowed.
+     * @param _reward The reward amount in wei.
+     */
     function createSurvey(
         string memory _description, 
         string[] memory _choices, 
@@ -54,14 +63,26 @@ contract SurveyManagement is UserManagement {
         newSurvey.reward = _reward;
         newSurvey.isClosed = 1; // Open
         newSurvey.owner = msg.sender;
+        newSurvey.rewardsDistributed = 0; // No
     }
 
+    /**
+     * @notice Returns the details of a survey.
+     * @dev Throws if the survey does not exist.
+     * @param _surveyId The ID of the survey.
+     * @return The survey details.
+     */
     function getSurvey(uint256 _surveyId) public view returns (Survey memory) {
         require(_surveyId < surveys.length, "Survey does not exist");
         return surveys[_surveyId];
     }
 
-    // To close survey manually by owner or automatically by expiration time
+    /**
+     * @notice Closes a survey.
+     * @dev Only the owner of the survey can close it. 
+     *      The survey can be closed manually by the owner or automatically by expiration time.
+     * @param _surveyId The ID of the survey to close.
+     */
     function closeSurvey(uint256 _surveyId) public {
         require(_surveyId < surveys.length, "Survey does not exist");
         Survey storage survey = surveys[_surveyId];
