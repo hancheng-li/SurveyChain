@@ -1,15 +1,29 @@
 # SurveyChain Documentation
 
 ## Table of Contents
-- [Overview](#overview)
-- [APIs](#apis)
-  - [User Management](#user-management)
-  - [Survey Management](#survey-management)
-  - [Voting](#voting)
-  - [Reward Distribution](#reward-distribution)
-- [Setup and Initialization](#setup-and-initialization)
-- [Components](#components)
-- [User Roles](#user-roles)
+- [SurveyChain Documentation](#surveychain-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [APIs](#apis)
+    - [User Management](#user-management)
+      - [`registerUser(string memory username)`](#registeruserstring-memory-username)
+    - [Survey Management](#survey-management)
+      - [`createSurvey(string memory _description, string[] memory _choices, uint256 duration, uint256 _maxVotes, uint256 _reward) payable`](#createsurveystring-memory-_description-string-memory-_choices-uint256-duration-uint256-_maxvotes-uint256-_reward-payable)
+      - [`getSurvey(uint256 _surveyId)`](#getsurveyuint256-_surveyid)
+      - [`closeSurvey(uint256 _surveyId)`](#closesurveyuint256-_surveyid)
+    - [Voting](#voting)
+      - [`vote(uint256 _surveyId, uint256 _choice)`](#voteuint256-_surveyid-uint256-_choice)
+    - [Reward Distribution](#reward-distribution)
+      - [`distributeRewards(uint256 _surveyId)`](#distributerewardsuint256-_surveyid)
+  - [Setup and Initialization](#setup-and-initialization)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Components](#components)
+    - [Contracts](#contracts)
+  - [User Roles](#user-roles)
+    - [Registered Users](#registered-users)
+    - [Unregistered Users](#unregistered-users)
+    - [Survey Owners](#survey-owners)
 
 ## Overview
 SurveyChain is a cutting-edge survey participation system built on blockchain technology, designed to streamline the creation and distribution of surveys. Our lightweight and user-friendly platform offers a comprehensive API that covers every aspect of the survey process, from creation and participation to closure. Engineered with robust security features, SurveyChain guarantees financial safety for both survey creators and participants. Additionally, we have implemented various techniques to minimize gas consumption, ensuring that creating and participating in surveys remains cost-effective.
@@ -26,9 +40,9 @@ As a survey owner, you can pose multiple single-option questions and close the s
 
 **How to Call:**
 
-\`\`\`
+```
 surveySystem.registerUser("Username");
-\`\`\`
+```
 
 **Returns:** None
 
@@ -42,9 +56,9 @@ surveySystem.registerUser("Username");
 
 **How to Call:**
 
-\`\`\`
+```
 surveySystem.createSurvey{value: reward}("Survey Description", ["Option 1", "Option 2"], 1 weeks, 100, 10 ether);
-\`\`\`
+```
 
 **Returns:** None
 
@@ -56,9 +70,9 @@ surveySystem.createSurvey{value: reward}("Survey Description", ["Option 1", "Opt
 
 **How to Call:**
 
-\`\`\`
+```
 Survey memory survey = surveySystem.getSurvey(0);
-\`\`\`
+```
 
 **Returns:** Survey struct containing survey details.
 
@@ -70,9 +84,9 @@ Survey memory survey = surveySystem.getSurvey(0);
 
 **How to Call:**
 
-\`\`\`
+```
 surveySystem.closeSurvey(0);
-\`\`\`
+```
 
 **Returns:** None
 
@@ -86,9 +100,9 @@ surveySystem.closeSurvey(0);
 
 **How to Call:**
 
-\`\`\`
+```
 surveySystem.vote(0, 0);
-\`\`\`
+```
 
 **Returns:** None
 
@@ -102,9 +116,9 @@ surveySystem.vote(0, 0);
 
 **How to Call:**
 
-\`\`\`
+```
 surveySystem.distributeRewards(0);
-\`\`\`
+```
 
 **Returns:** None
 
@@ -114,39 +128,40 @@ surveySystem.distributeRewards(0);
 
 ### Prerequisites
 
-Install Forge
+Install Forge. Instructions can be found here: [https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
 
 ### Installation
 
 Clone the repository:
 
-\`\`\` bash
+```bash
+>>>>>>> c1f9b64 (ReadMe adjusted)
 git clone https://github.com/hancheng-li/cs190j_final.git
-\`\`\`
+```
 
 Move to the project's directory:
 
-\`\`\` bash
+```bash
 cd SurveyChain
-\`\`\`
+```
 
 Install dependencies:
 
-\`\`\`bash
+```bash
 forge install
-\`\`\`
+```
 
 Compile the contracts:
 
-\`\`\`bash
+```bash
 forge build
-\`\`\`
+```
 
 Run the tests:
 
-\`\`\`bash
+```bash
 forge test
-\`\`\`
+```
 
 ## Components
 
