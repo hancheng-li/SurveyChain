@@ -135,7 +135,6 @@ Install Forge. Instructions can be found here: [https://book.getfoundry.sh/getti
 Clone the repository:
 
 ```bash
->>>>>>> c1f9b64 (ReadMe adjusted)
 git clone https://github.com/hancheng-li/cs190j_final.git
 ```
 
