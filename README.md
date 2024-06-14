@@ -120,6 +120,7 @@ Clone the repository:
 
 \`\`\`bash
 git clone https://github.com/hancheng-li/cs190j_final.git
+\`\`\`
 cd SurveyChain
 \`\`\`
 
