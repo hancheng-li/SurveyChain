@@ -24,7 +24,7 @@ SurveyChain is a cutting-edge survey participation system built on blockchain te
 
 **How to Call:**
 
-\`\`\`solidity
+\`\`\`
 surveySystem.registerUser("Username");
 \`\`\`
 
@@ -40,7 +40,7 @@ surveySystem.registerUser("Username");
 
 **How to Call:**
 
-\`\`\`solidity
+\`\`\`
 surveySystem.createSurvey{value: reward}("Survey Description", ["Option 1", "Option 2"], 1 weeks, 100, 10 ether);
 \`\`\`
 
@@ -54,7 +54,7 @@ surveySystem.createSurvey{value: reward}("Survey Description", ["Option 1", "Opt
 
 **How to Call:**
 
-\`\`\`solidity
+\`\`\`
 Survey memory survey = surveySystem.getSurvey(0);
 \`\`\`
 
@@ -68,7 +68,7 @@ Survey memory survey = surveySystem.getSurvey(0);
 
 **How to Call:**
 
-\`\`\`solidity
+\`\`\`
 surveySystem.closeSurvey(0);
 \`\`\`
 
@@ -84,7 +84,7 @@ surveySystem.closeSurvey(0);
 
 **How to Call:**
 
-\`\`\`solidity
+\`\`\`
 surveySystem.vote(0, 0);
 \`\`\`
 
@@ -100,7 +100,7 @@ surveySystem.vote(0, 0);
 
 **How to Call:**
 
-\`\`\`solidity
+\`\`\`
 surveySystem.distributeRewards(0);
 \`\`\`
 
