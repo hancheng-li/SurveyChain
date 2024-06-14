@@ -39,7 +39,7 @@ contract VotingTest is Test {
         assertEq(survey.votes[1], 0);
         assertEq(survey.voters.length, 1);
         assertEq(survey.voters[0], voter);
-        assertEq(surveySystem.hasVoted(0, voter), true);
+        assertEq(surveySystem.hasVoted(0, voter), 1);
     }
 
     // Test 2: Attempt to vote in a non-existent survey

@@ -94,4 +94,6 @@ contract SurveyManagement is UserManagement {
             survey.isClosed = 2; // Closed
         }
     }
+
+    receive() external payable {}
 }

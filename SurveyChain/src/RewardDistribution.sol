@@ -35,6 +35,4 @@ contract RewardDistribution is SurveyManagement {
         survey.rewardsDistributed = 1; // Yes
         survey.reward = 0;
     }
-
-    receive() external payable {}
 }
