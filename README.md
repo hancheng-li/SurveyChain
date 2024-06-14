@@ -118,9 +118,13 @@ Install Forge
 
 Clone the repository:
 
-\`\`\`bash
+\`\`\` bash
 git clone https://github.com/hancheng-li/cs190j_final.git
 \`\`\`
+
+Move to the project's directory:
+
+\`\`\` bash
 cd SurveyChain
 \`\`\`
 
