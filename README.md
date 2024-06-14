@@ -172,3 +172,4 @@ forge test
 - Create surveys
 - Close surveys
 - Distribute rewards
+- Unable to vote in their own surveys
